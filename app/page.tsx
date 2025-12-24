@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { 
   Loader2, Search, Database, Cpu, Target, 
   BarChart3, RefreshCw, Layers, CheckCircle2,
-  Car, Bird, Package, Clipboard, Info, ArrowRight, Zap, X, Maximize2
+  Car, Bird, Package, Clipboard, Info, ArrowRight, Zap, X, Maximize2, Mail
 } from "lucide-react";
 
 // --- Types ---
@@ -93,7 +93,6 @@ export default function DinoRetrievalApp() {
 
   // --- API Handlers ---
 
-  // Standalone function to refresh examples
   const refreshExamples = async () => {
     setIsExamplesLoading(true);
     try {
@@ -119,8 +118,6 @@ export default function DinoRetrievalApp() {
       const data = result.data as LoadResourcesResponse;
       setStatus(data[0]);
       setStats(parseStats(data[1]));
-      
-      // Fetch initial examples
       await refreshExamples();
     } catch { 
       setStatus("Sync Failed"); 
@@ -187,7 +184,7 @@ export default function DinoRetrievalApp() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#f1f5f9] text-slate-900 font-sans pb-20 selection:bg-blue-100">
+    <div className="min-h-screen flex flex-col bg-[#f1f5f9] text-slate-900 font-sans selection:bg-blue-100">
       
       {/* --- INITIALIZE AI FULLSCREEN OVERLAY --- */}
       <AnimatePresence>
@@ -248,7 +245,8 @@ export default function DinoRetrievalApp() {
         )}
       </AnimatePresence>
 
-      <div className="max-w-7xl mx-auto p-4 md:p-8 space-y-8">
+      <div className="max-w-7xl mx-auto p-4 md:p-8 space-y-8 flex-1 w-full">
+        {/* Header Section */}
         <header className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
           <div className="space-y-4">
             <motion.h1 initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-5xl font-black tracking-tighter text-slate-900">
@@ -268,7 +266,7 @@ export default function DinoRetrievalApp() {
                     <div className="bg-blue-50 p-2.5 rounded-2xl h-fit shadow-inner"><Info className="text-blue-500" size={20} /></div>
                     <div className="text-sm text-slate-600 leading-relaxed">
                       <p>
-                        Powered by <a href="https://ai.meta.com/dinov3/" target="_href"> <strong className="font-bold text-slate-900">Meta AI&apos;s DINOv3</strong>.</a> In this demo you can select from different image retrieval datasets to explore how well DINOv3 performs in finding visually similar images.
+                        Powered by <strong className="font-bold text-slate-900">Meta AI&apos;s DINOv3</strong>. This foundation model clusters image data semantically without human supervision.
                       </p>
                     </div>
                   </div>
@@ -286,6 +284,7 @@ export default function DinoRetrievalApp() {
         </header>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+          
           {/* Sidebar Section */}
           <div className="lg:col-span-4 space-y-6">
             <section className="bg-white p-7 rounded-[40px] shadow-sm border border-slate-200 space-y-8">
@@ -400,7 +399,6 @@ export default function DinoRetrievalApp() {
               <div className="p-8 pt-4">
                 {activeTab === "example" ? (
                   <div className="relative min-h-[160px] space-y-6">
-                    {/* Header for Examples with Refresh Button */}
                     <div className="flex items-center justify-between px-2">
                       <h4 className="text-[10px] font-black uppercase text-slate-400 tracking-widest flex items-center gap-2">
                         Test Gallery
@@ -496,6 +494,32 @@ export default function DinoRetrievalApp() {
           </div>
         </div>
       </div>
+
+      {/* --- FOOTER SECTION --- */}
+      <footer className="w-full bg-white border-t border-slate-200 py-12 mt-12 px-8">
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8 text-center md:text-left">
+          <div className="space-y-2">
+            <p className="text-slate-900 font-black text-lg tracking-tighter">
+              Made by Paweł Piwowarski <span className="text-blue-600">2025</span>
+            </p>
+            <p className="text-slate-400 text-xs font-bold uppercase tracking-widest">
+              Computer Vision & AI Enthusiast
+            </p>
+          </div>
+          
+          <div className="max-w-md bg-slate-50 p-5 rounded-3xl border border-slate-100 flex items-center gap-4 transition-all hover:shadow-md group">
+            <div className="bg-blue-600 p-3 rounded-2xl text-white shadow-lg group-hover:scale-110 transition-transform">
+              <Mail size={20} />
+            </div>
+            <div className="text-left">
+              <p className="text-slate-800 font-bold text-sm">Custom Implementation?</p>
+              <p className="text-slate-500 text-[13px] leading-relaxed">
+                Interested in using image retrieval for your custom dataset? Contact me at <a href="mailto:pawelpiwowarski2000@gmail.com" className="text-blue-600 font-bold hover:underline">pawelpiwowarski2000@gmail.com</a> for individual pricing.
+              </p>
+            </div>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }
