@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { 
   Loader2, Search, Database, Cpu, Target, 
   BarChart3, RefreshCw, Layers, CheckCircle2,
-  Car, Bird, Package, Clipboard, Info, ArrowRight
+  Car, Bird, Package, Clipboard, Info, ArrowRight, Zap, X
 } from "lucide-react";
 
 // --- Types ---
@@ -37,6 +37,9 @@ export default function DinoRetrievalApp() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isSearching, setIsSearching] = useState<boolean>(false);
   const [activeTab, setActiveTab] = useState<"example" | "upload">("example");
+  
+  // State for closing the information box
+  const [showInfo, setShowInfo] = useState<boolean>(true);
 
   const clientRef = useRef<Client | null>(null);
 
@@ -148,7 +151,36 @@ export default function DinoRetrievalApp() {
 
   return (
     <div className="min-h-screen bg-[#f1f5f9] text-slate-900 font-sans pb-20">
-      {isLoading && <div className="fixed top-0 left-0 right-0 h-1 bg-blue-600 z-50 animate-pulse" />}
+      
+      {/* --- INITIALIZE AI SCREEN --- */}
+      <AnimatePresence>
+        {isLoading && (
+          <motion.div 
+            initial={{ opacity: 0 }} 
+            animate={{ opacity: 1 }} 
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] bg-slate-900/80 backdrop-blur-md flex flex-col items-center justify-center text-white p-4"
+          >
+            <motion.div 
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              // INCREASED WIDTH HERE (max-w-xl)
+              className="bg-white/10 p-12 rounded-[40px] border border-white/20 flex flex-col items-center gap-8 shadow-2xl max-w-xl w-full text-center"
+            >
+              <div className="relative">
+                <Loader2 className="animate-spin text-blue-500" size={80} />
+                <Zap className="absolute inset-0 m-auto text-white animate-pulse" size={32} />
+              </div>
+              <div className="space-y-4">
+                <h2 className="text-3xl font-black tracking-widest uppercase italic">Loading Resources</h2>
+                <p className="text-blue-300 font-mono text-xl animate-pulse px-4">
+                  {status}
+                </p>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <div className="max-w-7xl mx-auto p-4 md:p-8 space-y-8">
         {/* Header & Fixed Info Box */}
@@ -158,34 +190,50 @@ export default function DinoRetrievalApp() {
               🦖 DINO<span className="text-blue-600">v3</span> Retrieval
             </motion.h1>
             
-            {/* FIXED INFO BOX LAYOUT */}
-            <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm space-y-4">
-              <div className="flex gap-4">
-                <div className="bg-blue-50 p-2 rounded-full h-fit">
-                  <Info className="text-blue-500" size={20} />
-                </div>
-                <div className="text-sm text-slate-600 leading-relaxed">
-                  <p>
-                    This system uses <strong className="font-bold text-slate-900">DINOv3 </strong>, a state-of-the-art foundation vision model. 
-                    <br />
-                    For more info about Dinov3 see the <a href="https://ai.meta.com/dinov3/" target="_blank" rel="noreferrer" className="text-blue-600 underline font-medium">site. </a> In this demo you can select from different image retrieval datasets to explore how well DINOv3 performs in finding visually similar images.
-                  </p>
-                </div>
-              </div>
-              
-              <div className="flex flex-wrap gap-4 pt-2 border-t border-slate-50">
-                {[
-                  { label: "SELECT EXAMPLE", icon: <CheckCircle2 size={14} /> },
-                  { label: "UPLOAD IMAGE", icon: <CheckCircle2 size={14} /> },
-                  { label: "PASTE (CTRL+V)", icon: <CheckCircle2 size={14} /> }
-                ].map((item) => (
-                  <div key={item.label} className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-slate-400">
-                    <span className="text-blue-500">{item.icon}</span>
-                    {item.label}
+            <AnimatePresence>
+              {showInfo && (
+                <motion.div 
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                  exit={{ opacity: 0, height: 0 }}
+                  className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm space-y-4 relative overflow-hidden"
+                >
+                  {/* Close Button */}
+                  <button 
+                    onClick={() => setShowInfo(false)}
+                    className="absolute top-4 right-4 p-1 rounded-full hover:bg-slate-100 transition-colors text-slate-400 hover:text-slate-600"
+                  >
+                    <X size={18} />
+                  </button>
+
+                  <div className="flex gap-4 pr-6">
+                    <div className="bg-blue-50 p-2 rounded-full h-fit">
+                      <Info className="text-blue-500" size={20} />
+                    </div>
+                    <div className="text-sm text-slate-600 leading-relaxed">
+                      <p>
+                        This system uses <strong className="font-bold text-slate-900">DINOv3 </strong>, a state-of-the-art foundation vision model. 
+                        <br />
+                        For more info about Dinov3 see the <a href="https://ai.meta.com/dinov3/" target="_blank" rel="noreferrer" className="text-blue-600 underline font-medium">site. </a> In this demo you can select from different image retrieval datasets to explore how well DINOv3 performs in finding visually similar images.
+                      </p>
+                    </div>
                   </div>
-                ))}
-              </div>
-            </div>
+                  
+                  <div className="flex flex-wrap gap-4 pt-2 border-t border-slate-50">
+                    {[
+                      { label: "SELECT EXAMPLE", icon: <CheckCircle2 size={14} /> },
+                      { label: "UPLOAD IMAGE", icon: <CheckCircle2 size={14} /> },
+                      { label: "PASTE (CTRL+V)", icon: <CheckCircle2 size={14} /> }
+                    ].map((item) => (
+                      <div key={item.label} className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-slate-400">
+                        <span className="text-blue-500">{item.icon}</span>
+                        {item.label}
+                      </div>
+                    ))}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
 
           <div className="flex flex-col md:items-end gap-2">
@@ -247,7 +295,7 @@ export default function DinoRetrievalApp() {
 
             <AnimatePresence>
               {stats && (
-                <motion.section initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="bg-gray-500 p-6 rounded-3xl shadow-xl text-white space-y-6">
+                <motion.section initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="bg-blue-600 p-6 rounded-3xl shadow-xl text-white space-y-6">
                   <div className="grid grid-cols-2 gap-4">
                     <div className="bg-white/10 p-4 rounded-2xl border border-white/5">
                       <p className="text-[9px] font-black text-white/40 uppercase tracking-widest">Precision@1</p>
